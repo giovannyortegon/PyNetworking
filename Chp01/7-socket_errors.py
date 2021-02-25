@@ -9,12 +9,9 @@ import argparse
 def main():
     # setup argument parsing
     parser = argparse.ArgumentParser(description='Socket Error Examples')
-    parser.add_argument('--host', action="store", dest="host",
-                         required=False)
-    parser.add_argument("--port", action="store", dest="port",
-                        required=False)
-    parser.add_argument("--file", action="store", dest="file",
-                        required=False)
+    parser.add_argument('--host', action="store", dest="host", required=False)
+    parser.add_argument("--port", action="store", dest="port", required=False)
+    parser.add_argument("--file", action="store", dest="file", required=False)
 
     given_args = parser.parse_args()
     host = given_args.host
@@ -34,15 +31,16 @@ def main():
         print("Address-related error connection to server: %s" % e)
         sys.exit(1)
     except socket.error as e:
-        print("Connetion error: %s" %e)
+        print("Connetion error: %s" % e)
         sys.exit(1)
     # Third try-except block -- sending data
     try:
-        msg = "GET %s HTTPS/1.0\r\n\r\n" % filename
+        msg = "GET %s HTTP/1.0\r\n\r\n" % filename
         s.sendall(msg.encode('utf-8'))
     except socket.error as e:
         print("Error sending data: %s" % e)
         sys.exit(1)
+    while 1:
         # Fourth try-except block -- waiting to recive data from remote host
         try:
             buf = s.recv(2048)
