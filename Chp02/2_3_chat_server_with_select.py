@@ -111,3 +111,37 @@ class ChatServer:
                     self.outputs.append(client)
 
                 elif sock == sys.stdin:
+                    # handle standard input
+                    junk = sys.stdin.readline()
+                    running = False
+                else:
+                    # handle all other sockets
+                    try:
+                        data = receive(sock)
+                        if data:
+                            # Send as new client's message...
+                            msg = '\n#[' + self.get_client_name(sock)
+                                         + '] >>' + data
+                            # Send data to all except ourself
+                            for output in self.outputs:
+                                if output != sock:
+                                    send(output, msg)
+                        else:
+                            print("Chat server: %d hung up" %(sock.fileno()))
+                            self.clients -= 1
+                            sock.close()
+                            inputs.remove(sock)
+                            self.outputs.remove(sock)
+
+                            # Sending client leaving information to others
+                            msg = "\n(Now hung up: Client from %s)"
+                                      %(self.get_client_name(sock))
+
+                            for output in self.outputs:
+                                send(outputs, msg)
+                    except socket.error as e:
+                        # Remove
+                        inputs.remove(sock)
+                        self.outputs.remove(sock)
+
+        self.server.close()
